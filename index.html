@@ -1,29 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Firebase Demo</title>
+  <meta charset="UTF-8">
+  <title>Firebase 測試頁面</title>
 </head>
 <body>
-  <h1>Hello Firebase!</h1>
+  <h1>Firebase 測試</h1>
+
+  <input type="text" id="messageInput" placeholder="輸入要儲存的訊息">
   <button onclick="writeData()">寫入資料</button>
   <button onclick="readData()">讀取資料</button>
+
+  <h3>讀取結果：</h3>
   <div id="output"></div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase JS SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
 
   <script>
-    // 初始化 Firebase
-    // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+    // 🔧 將此區塊換成你的專案設定資訊！
+    const firebaseConfig = {
   apiKey: "AIzaSyBgln47TB5KK4u8OPifOPcjav0_S1Q-ZUs",
   authDomain: "test-4dcf0.firebaseapp.com",
   databaseURL: "https://test-4dcf0-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -34,17 +31,26 @@ const firebaseConfig = {
   measurementId: "G-BRFM6WY3NF"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+    // 初始化 Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // 寫入資料
     function writeData() {
-      db.ref("message").set("Hello from Firebase!");
+      const message = document.getElementById('messageInput').value;
+      database.ref('test/message').set(message)
+        .then(() => alert("寫入成功！"))
+        .catch((error) => alert("錯誤：" + error));
     }
 
+    // 讀取資料
     function readData() {
-      db.ref("message").once("value").then((snapshot) => {
-        document.getElementById("output").innerText = snapshot.val();
-      });
+      database.ref('test/message').once('value')
+        .then(snapshot => {
+          const data = snapshot.val();
+          document.getElementById('output').innerText = data || "尚未有資料";
+        })
+        .catch((error) => alert("錯誤：" + error));
     }
   </script>
 </body>
