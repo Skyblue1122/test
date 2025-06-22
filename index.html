@@ -14,43 +14,40 @@
   <h3>讀取結果：</h3>
   <div id="output"></div>
 
-  <!-- Firebase JS SDK -->
+  <!-- ✅ 只載入 compat 版本 -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
   <script>
-    // 🔧 將此區塊換成你的專案設定資訊！
     const firebaseConfig = {
-  apiKey: "AIzaSyBgln47TB5KK4u8OPifOPcjav0_S1Q-ZUs",
-  authDomain: "test-4dcf0.firebaseapp.com",
-  databaseURL: "https://test-4dcf0-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "test-4dcf0",
-  storageBucket: "test-4dcf0.firebasestorage.app",
-  messagingSenderId: "252652582147",
-  appId: "1:252652582147:web:96099e11f4fe506c44a536",
-  measurementId: "G-BRFM6WY3NF"
-};
+      apiKey: "AIzaSyBgln47TB5KK4u8OPifOPcjav0_S1Q-ZUs",
+      authDomain: "test-4dcf0.firebaseapp.com",
+      databaseURL: "https://test-4dcf0-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "test-4dcf0",
+      storageBucket: "test-4dcf0.appspot.com",
+      messagingSenderId: "252652582147",
+      appId: "1:252652582147:web:96099e11f4fe506c44a536",
+      measurementId: "G-BRFM6WY3NF"
+    };
 
     // 初始化 Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // 寫入資料
     function writeData() {
       const message = document.getElementById('messageInput').value;
       database.ref('test/message').set(message)
-        .then(() => alert("寫入成功！"))
-        .catch((error) => alert("錯誤：" + error));
+        .then(() => alert("✅ 資料已寫入 Firebase！"))
+        .catch((error) => alert("❌ 寫入錯誤：" + error));
     }
 
-    // 讀取資料
     function readData() {
       database.ref('test/message').once('value')
         .then(snapshot => {
           const data = snapshot.val();
           document.getElementById('output').innerText = data || "尚未有資料";
         })
-        .catch((error) => alert("錯誤：" + error));
+        .catch((error) => alert("❌ 讀取錯誤：" + error));
     }
   </script>
 </body>
