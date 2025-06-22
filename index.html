@@ -1,53 +1,99 @@
-<!DOCTYPE html>
 <html>
+<meta charset="utf-8">
 <head>
-  <meta charset="UTF-8">
-  <title>Firebase 測試頁面</title>
+  <title>聊天室</title>
 </head>
 <body>
-  <h1>Firebase 測試</h1>
+  <!-- 輸入框讓使用者輸入訊息 -->
+  <input type="text" placeholder="在這裡輸入訊息" id="input">
+  
+  <!-- 按鈕，點擊後送出訊息 -->
+  <button id="sendBtn">送出</button><br>
+  
+  <!-- 用來顯示所有訊息的區塊 -->
+  <div id="messages">
+    <div class="message"></div>
+  </div>
+  
+  <!-- 使用 module 型態的 script，才能用 import -->
+  <script type="module">
+    // 從 Firebase SDK 載入必要的模組
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
-  <input type="text" id="messageInput" placeholder="輸入要儲存的訊息">
-  <button onclick="writeData()">寫入資料</button>
-  <button onclick="readData()">讀取資料</button>
-
-  <h3>讀取結果：</h3>
-  <div id="output"></div>
-
-  <!-- ✅ 只載入 compat 版本 -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-
-  <script>
+    // 你的 Firebase 專案設定，初始化時用
     const firebaseConfig = {
       apiKey: "AIzaSyBgln47TB5KK4u8OPifOPcjav0_S1Q-ZUs",
       authDomain: "test-4dcf0.firebaseapp.com",
       databaseURL: "https://test-4dcf0-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "test-4dcf0",
-      storageBucket: "test-4dcf0.appspot.com",
+      storageBucket: "test-4dcf0.firebasestorage.app",
       messagingSenderId: "252652582147",
       appId: "1:252652582147:web:96099e11f4fe506c44a536",
       measurementId: "G-BRFM6WY3NF"
     };
 
-    // 初始化 Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    // 初始化 Firebase app
+    const app = initializeApp(firebaseConfig);
+    
+    // 取得 Firebase Realtime Database 實例
+    const db = getDatabase(app);
+    
+    // 建立指向資料庫中 "messages" 節點的參照
+    const messagesRef = ref(db, "messages");
 
-    function writeData() {
-      const message = document.getElementById('messageInput').value;
-      database.ref('test/message').set(message)
-        .then(() => alert("✅ 資料已寫入 Firebase！"))
-        .catch((error) => alert("❌ 寫入錯誤：" + error));
-    }
+    // 綁定點擊事件，當使用者點「送出」按鈕時執行
+    document.getElementById("sendBtn").addEventListener("click", () => {
+      // 建立訊息物件，包含名稱、時間戳與訊息內容
+      const message = {
+        username: "訪客",
+        time: Date.now(),
+        message: document.getElementById('input').value,
+      };
+      
+      // 將訊息推送（新增）到 Firebase 資料庫 messages 節點
+      push(messagesRef, message);
+      
+      // 清空輸入框，方便下一次輸入
+      document.getElementById('input').value = "";
+    });
 
-    function readData() {
-      database.ref('test/message').once('value')
-        .then(snapshot => {
-          const data = snapshot.val();
-          document.getElementById('output').innerText = data || "尚未有資料";
-        })
-        .catch((error) => alert("❌ 讀取錯誤：" + error));
+    // 監聽資料庫 messages 節點中每一筆新資料的新增事件
+    // 每有新訊息被新增時，執行回呼函式取得訊息快照
+    onChildAdded(messagesRef, (snapshot) => {
+      // snapshot.val() 取出訊息物件內容
+      const msg = snapshot.val();
+      
+      // 呼叫顯示訊息的函式
+      displayMessage(msg);
+    });
+
+    // 顯示訊息的函式，會把訊息放進 messages 容器中
+    function displayMessage(msg) {
+      // 取得顯示訊息的區塊 div
+      const messagesDiv = document.getElementById("messages");
+      
+      // 建立一個新的 div 元素，代表一則訊息
+      const div = document.createElement("div");
+      
+      // 加入 message 這個 CSS 類別，可用來美化訊息
+      div.classList.add("message");
+      
+      // 將 timestamp 轉成人可讀的時間格式（只顯示時分秒）
+      const timeStr = new Date(msg.time).toLocaleTimeString();
+      
+      // 設定訊息文字內容，格式為：[時間] 使用者名稱: 訊息
+      div.textContent = `[${timeStr}] ${msg.username}: ${msg.message}`;
+      
+      // 將這則訊息新增到 messagesDiv 內，呈現在頁面上
+      if (messagesDiv.firstChild) {
+    messagesDiv.insertBefore(div, messagesDiv.firstChild);
+  } else {
+    messagesDiv.appendChild(div);
+  }
+      
+      // 滾動條自動滾到底部，讓最新訊息顯示在最下方
+      messagesDiv.scrollTop = 0;
     }
   </script>
 </body>
