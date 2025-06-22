@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase Demo</title>
+</head>
+<body>
+  <h1>Hello Firebase!</h1>
+  <button onclick="writeData()">寫入資料</button>
+  <button onclick="readData()">讀取資料</button>
+  <div id="output"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+
+  <script>
+    // 初始化 Firebase
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBgln47TB5KK4u8OPifOPcjav0_S1Q-ZUs",
+  authDomain: "test-4dcf0.firebaseapp.com",
+  databaseURL: "https://test-4dcf0-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "test-4dcf0",
+  storageBucket: "test-4dcf0.firebasestorage.app",
+  messagingSenderId: "252652582147",
+  appId: "1:252652582147:web:96099e11f4fe506c44a536",
+  measurementId: "G-BRFM6WY3NF"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+    function writeData() {
+      db.ref("message").set("Hello from Firebase!");
+    }
+
+    function readData() {
+      db.ref("message").once("value").then((snapshot) => {
+        document.getElementById("output").innerText = snapshot.val();
+      });
+    }
+  </script>
+</body>
+</html>
